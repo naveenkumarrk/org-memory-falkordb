@@ -1,0 +1,10 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+    ports:
+      - "127.0.0.1:16379:6379"
+    volumes:
+      - graph-data:/data
+    restart: unless-stopped
+volumes:
+  graph-data:

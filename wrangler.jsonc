@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "org-memory-falkordb",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "assets": { "directory": "./web", "binding": "ASSETS", "run_worker_first": true },
+  "vars": { "DEMO_ENABLED": "true" },
+  "observability": { "enabled": true }
+}

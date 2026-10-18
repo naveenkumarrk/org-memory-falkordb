@@ -11,10 +11,35 @@
     "node": ">=24"
   },
   "scripts": {
-    "test": "node --no-warnings --test test/*.test.ts"
+    "test": "node --no-warnings --test test/*.test.ts",
+    "dev": "npm run build:ui && wrangler dev --ip 127.0.0.1 --port 8787",
+    "build:ui": "node --no-warnings scripts/build-web.ts",
+    "setup:local": "node --no-warnings scripts/setup-local.ts",
+    "demo:seed": "node --no-warnings scripts/seed-demo.ts",
+    "demo:migrate": "node --no-warnings scripts/seed-demo.ts --migrated",
+    "demo:agent": "node --no-warnings scripts/demo-agent.ts",
+    "demo:hooks": "node --no-warnings scripts/setup-hooks.ts",
+    "demo:verify": "node --no-warnings scripts/verify-demo.ts",
+    "hosted:check": "node --no-warnings scripts/check-hosted.ts",
+    "hosted:configure": "node --no-warnings scripts/configure-hosted.ts",
+    "typecheck": "tsc --noEmit",
+    "deploy": "npm run build:ui && wrangler deploy",
+    "deploy:check": "npm run build:ui && wrangler deploy --dry-run --outdir dist"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/naveenkumarrk/org-memory-falkordb.git"
+  },
+  "dependencies": {
+    "cytoscape": "^3.34.4",
+    "falkordb": "^6.8.0",
+    "hono": "^4.13.13",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261018.1",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.151.1"
   }
 }

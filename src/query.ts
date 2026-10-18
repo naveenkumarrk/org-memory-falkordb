@@ -246,6 +246,9 @@ function scoreItems(db: DatabaseSync, rows: Row[], opts: QueryOpts, via: (r: Row
     const kind = p.kind === 'config_history' ? 'config_history' : r.type;
     if (r.type === 'Fact' && kind !== 'config_history' && p.status !== 'current') continue; // never inject knowledge about code that has changed
     const w = p.work ? JSON.parse((getWork.get(p.work) as Row | undefined)?.props ?? '{}') : {};
+    if (Array.isArray(w.repos) && w.repos.some((repo: string) => !repoIncluded(settings, repo))) continue;
+    const anchoredRepos = (db.prepare("SELECT n.props FROM edges e JOIN nodes n ON n.id=e.dst WHERE e.src=? AND e.rel='ABOUT' AND n.type='File'").all(r.id) as Row[]).map(n => JSON.parse(n.props).slug);
+    if (anchoredRepos.some((repo: string) => !repoIncluded(settings, repo))) continue;
     if (opts.excludeSession && w.session === opts.excludeSession) continue;
     if (ov.hidden.includes(r.id) || (p.work && ov.hidden.includes(p.work))) continue;
     const votes = fb.get(r.id) ?? fb.get(p.work) ?? { up: 0, down: 0 };

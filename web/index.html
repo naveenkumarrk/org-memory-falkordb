@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Org Memory — context that carries forward</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/vendor/cytoscape.min.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header><a class="brand" href="/">◈ <strong>org memory</strong><span> / graph hacks</span></a><div class="header-right"><span id="health" class="status">Connecting</span><a href="https://github.com/naveenkumarrk/org-memory-falkordb" target="_blank" rel="noreferrer">Source ↗</a></div></header>
+  <main>
+    <div class="eyebrow">CONNECTED MEMORY FOR CODING AGENTS</div>
+    <section class="intro"><div><h1>The next session<br>should know <em>why.</em></h1><p>A fresh agent. The team's past discoveries. A graph connecting the two—with the evidence attached.</p></div><aside><span class="badge">SYNTHETIC DEMONSTRATION</span><h3>One small change.<br>An unexpected dependency.</h3><p>Before simplifying authentication, find what an earlier session learned about the mobile checkout client.</p></aside></section>
+    <section class="workbench">
+      <div class="panel-top"><div><span class="dot"></span> DEMO / COMMERCE <span class="muted">· fresh agent session</span></div><button id="refresh" class="text-button">Refresh graph ↻</button></div>
+      <form id="recall-form"><label for="query">What is the agent working on?</label><div class="query-row"><input id="query" value="Simplify src/authentication.ts" maxlength="2000" autocomplete="off"><button id="recall" type="submit">Find relevant memory ↗</button></div><div class="controls"><label><input id="expansion" type="checkbox" checked> Follow graph relationships</label><span id="metrics">Ready to retrieve</span></div></form>
+      <div class="workspace"><div class="graph-panel"><div class="section-label">01 / FOLLOW THE CONNECTIONS</div><div id="graph" aria-label="Interactive memory graph"></div><div class="legend"><span><i class="file"></i> File</span><span><i class="work"></i> Past work</span><span><i class="fact"></i> Fact</span><span><i class="decision"></i> Decision</span></div></div><div class="evidence-panel"><div class="section-label">02 / INSPECT THE EVIDENCE</div><div id="evidence" aria-live="polite"><p class="empty">Retrieve memory to see the source and the path behind each result.</p></div></div></div>
+      <details class="context"><summary>Context packet delivered to the agent <span id="chars"></span></summary><pre id="context">No context retrieved yet.</pre></details>
+      <details id="query-details" class="context"><summary>Inspect executed FalkorDB queries <span id="query-count"></span></summary><pre id="queries">Retrieve memory to inspect the actual parameterized Cypher and query timings.</pre></details>
+    </section>
+    <section class="bottom-grid"><article><div class="section-label">03 / WATCH IT CHANGE AN ACTION</div><h2>Remember. Check. Adapt.</h2><p>The demo policy uses a retrieved fact to select an allowlisted compatibility test. It tests a proposed removal, writes a compatibility patch, and tests that patch.</p><code>npm run demo:agent</code><p class="note">A deterministic policy with real test execution. This is not an LLM benchmark.</p></article><article><div class="section-label">LATEST REPORTED EXECUTION</div><div id="outcomes"><p class="empty">Run the demo command, then refresh to inspect its test outcomes.</p></div><p class="note">Execution output is reported by the local client. Source grounding and behavioral checks are labeled separately.</p></article></section>
+    <footer><span>Built on the existing org-memory capture and extraction pipeline.</span><span>FalkorDB · Cloudflare Workers · Hono · Cytoscape.js</span></footer>
+  </main>
+</body></html>

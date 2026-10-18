@@ -100,6 +100,10 @@ export function claudeJson(o: { model: string; system: string; prompt: string; s
 
 export async function extractChunk(c: Chunk, cacheDir: string, tmpDir: string): Promise<ExtractResult> {
   const k = chunkKey(c);
+  // Preserve the already-redacted excerpt for traceable graph ingestion, including cache hits.
+  const sourceDir = path.join(cacheDir, 'sources');
+  fs.mkdirSync(sourceDir, { recursive: true });
+  fs.writeFileSync(path.join(sourceDir, `${k}.txt`), c.text, { mode: 0o600 });
   const cacheFile = path.join(cacheDir, `${k}.json`);
   if (fs.existsSync(cacheFile)) {
     const hit = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));

@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { CORPUS, dataDir } from './config.ts';
 import { loadSettings } from './settings.ts';
 
@@ -11,13 +12,13 @@ const LOCK_STALE_MS = 15 * 60_000;
 try {
   const input = JSON.parse(fs.readFileSync(0, 'utf8') || '{}');
   // live capture is for company sessions only (cwd under the company workspace); test sessions are backfilled by hand
-  const company = String(input.cwd ?? '').startsWith(CORPUS.prod.repoRoot);
+  const relative = path.relative(CORPUS.prod.repoRoot, String(input.cwd ?? ''));
+  const company = relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
   if (process.env.ORG_MEMORY_INTERNAL !== '1' && loadSettings().enabled && input.session_id && company) {
-    const test = false;
     const dir = dataDir('prod');
     const stateDir = path.join(dir, 'state');
     fs.mkdirSync(stateDir, { recursive: true });
-    const stamp = path.join(stateDir, `sync-${input.session_id}.stamp`);
+    const stamp = path.join(stateDir, `sync-${createHash('sha256').update(String(input.session_id)).digest('hex')}.stamp`);
     const lock = path.join(dir, 'sync.lock');
     const fresh = (f: string, ms: number) => { try { return Date.now() - fs.statSync(f).mtimeMs < ms; } catch { return false; } };
     // never sync while a full backfill is writing the same records
@@ -26,9 +27,8 @@ try {
       fs.writeFileSync(stamp, '');
       fs.mkdirSync(path.join(dir, 'logs'), { recursive: true });
       const log = fs.openSync(path.join(dir, 'logs', 'sync.log'), 'a');
-      const cli = path.join(path.dirname(new URL(import.meta.url).pathname), 'cli.ts');
-      const sh = `touch '${lock}'; node --no-warnings '${cli}' sync --session '${input.session_id}' ${test ? '--test' : ''}; rm -f '${lock}'`;
-      spawn('/bin/sh', ['-c', sh], { detached: true, stdio: ['ignore', log, log], env: { ...process.env } }).unref();
+      const runner = path.join(path.dirname(new URL(import.meta.url).pathname), 'sync-runner.ts');
+      spawn(process.execPath, ['--no-warnings', runner, String(input.session_id)], { detached: true, stdio: ['ignore', log, log], env: { ...process.env } }).unref();
     }
   }
 } catch { /* fail open */ }

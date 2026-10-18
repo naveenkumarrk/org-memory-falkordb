@@ -39,16 +39,17 @@ export function openGraph(corpus: Corpus): DatabaseSync {
   return new DatabaseSync(graphPath(corpus), { readOnly: true });
 }
 
-export function build(corpus: Corpus, log: (s: string) => void = () => {}, opts: { before?: string; out?: string } = {}) {
+export type GraphData = { nodes: Array<{ id: string; type: string; props: Record<string, any> }>; edges: Array<{ src: string; rel: string; dst: string; w: number }> };
+export function build(corpus: Corpus, log: (s: string) => void = () => {}, opts: { before?: string; out?: string; collect?: boolean } = {}) {
   const t0 = Date.now();
   // --before builds a time-split graph (only work that ended before the cutoff) for replay tests
   const excluded = new Set(loadSettings().excludedSessions);
   const records = loadRecords(corpus).filter((r) => (!opts.before || r.ended < opts.before) && !excluded.has(r.session));
   const target = opts.out ?? graphPath(corpus);
   const tmp = `${target}.tmp`;
-  fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.rmSync(tmp, { force: true });
-  const db = new DatabaseSync(tmp);
+  if (!opts.collect) { fs.mkdirSync(path.dirname(target), { recursive: true }); fs.rmSync(tmp, { force: true }); }
+  // The shared backend consumes a snapshot compiled in memory. No SQLite file is its data store.
+  const db = new DatabaseSync(opts.collect ? ':memory:' : tmp);
   db.exec(SCHEMA);
   const insNode = db.prepare('INSERT OR REPLACE INTO nodes(id, type, props) VALUES (?, ?, ?)');
   const insEdge = db.prepare('INSERT INTO edges(src, rel, dst, w) VALUES (?, ?, ?, ?) ON CONFLICT(src, rel, dst) DO UPDATE SET w = max(w, excluded.w)');
@@ -79,14 +80,17 @@ export function build(corpus: Corpus, log: (s: string) => void = () => {}, opts:
       if (!seen.has(did)) { node(did, 'Dir', { slug: f.slug, path: parts.slice(0, i).join('/') }); edge(parent, 'CONTAINS', did); }
       parent = did;
     }
-    node(fid, 'File', { slug: f.slug, rel: f.rel });
+    const root = repoIdx(f.slug).roots[0];
+    let fingerprint: string | undefined;
+    try { if (root) fingerprint = crypto.createHash('sha256').update(fs.readFileSync(path.join(root, f.rel))).digest('hex'); } catch { /* unavailable file */ }
+    node(fid, 'File', { slug: f.slug, rel: f.rel, ...(fingerprint ? { fingerprint } : {}) });
     edge(parent, 'CONTAINS', fid);
     return fid;
   };
   const anchoredStatus = (files: FileRef[], since: string, ownShas: string[] = []): string => {
     if (!files.length) return 'unanchored';
-    const states = files.map((f) => (repoIdx(f.slug).roots.length ? repoIdx(f.slug).fileState(f.rel, since, ownShas) : 'current'));
-    return states.includes('changed_since') ? 'changed_since' : states.every((s) => s === 'not_on_main') ? 'not_on_main' : 'current';
+    const states = files.map((f) => (repoIdx(f.slug).roots.length ? repoIdx(f.slug).fileState(f.rel, since, ownShas) : 'unknown'));
+    return states.includes('changed_since') ? 'changed_since' : states.includes('unknown') ? 'unknown' : states.every((s) => s === 'not_on_main') ? 'not_on_main' : 'current';
   };
 
   db.exec('BEGIN');
@@ -187,8 +191,12 @@ export function build(corpus: Corpus, log: (s: string) => void = () => {}, opts:
   const ecounts = db.prepare('SELECT rel, count(*) n FROM edges GROUP BY rel').all();
   db.prepare('INSERT INTO meta(k, v) VALUES (?, ?)').run('built', JSON.stringify({ at: new Date().toISOString(), records: records.length, commitsLinked, coChangeEdges: co, configFacts: cfgFacts, before: opts.before ?? null, ms: Date.now() - t0 }));
   db.exec('COMMIT');
+  const snapshot: GraphData | undefined = opts.collect ? {
+    nodes: (db.prepare('SELECT id,type,props FROM nodes').all() as any[]).map(n => ({ id: n.id, type: n.type, props: JSON.parse(n.props) })),
+    edges: db.prepare('SELECT src,rel,dst,w FROM edges').all() as GraphData['edges'],
+  } : undefined;
   db.close();
-  fs.renameSync(tmp, target);
-  log(`graph built in ${Date.now() - t0} ms → ${target}`);
-  return { records: records.length, commitsLinked, configFacts: cfgFacts, nodes: counts, edges: ecounts };
+  if (!opts.collect) fs.renameSync(tmp, target);
+  log(`graph built in ${Date.now() - t0} ms → ${opts.collect ? 'in-memory upload snapshot' : target}`);
+  return { records: records.length, commitsLinked, configFacts: cfgFacts, nodes: counts, edges: ecounts, snapshot };
 }

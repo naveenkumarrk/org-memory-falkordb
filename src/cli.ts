@@ -5,6 +5,8 @@ import { relatedToFiles, relatedToText, resolveTarget, renderCards } from './que
 import type { Corpus } from './config.ts';
 import { serve } from './server.ts';
 import { install, status, writeHooksFile } from './install.ts';
+import { remoteConfig } from './remote.ts';
+import { publish } from './publish.ts';
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
@@ -38,8 +40,8 @@ async function main() {
     case 'sync': {
       // live capture: re-extract one session (only new chunks cost anything) and rebuild the graph
       const st = await backfill(corpus, { session: opt('session'), log });
-      const g = build(corpus, log);
-      console.log(JSON.stringify({ extracted: st.extracted, cached: st.cached, works: st.works, costUsd: st.costUsd, graphRecords: g.records }));
+      const graph = remoteConfig() ? await publish(corpus, log) : build(corpus, log);
+      console.log(JSON.stringify({ extracted: st.extracted, cached: st.cached, works: st.works, costUsd: st.costUsd, graph }));
       break;
     }
     case 'install': {
@@ -58,6 +60,10 @@ async function main() {
     }
     case 'build': {
       console.log(JSON.stringify(build(corpus, log), null, 2));
+      break;
+    }
+    case 'publish': {
+      console.log(JSON.stringify(await publish(corpus, log), null, 2));
       break;
     }
     case 'related': {
@@ -102,6 +108,7 @@ async function main() {
       console.log(`usage: orgmem <command> [--test]
   backfill [--limit N] [--session ID] [--since ISO] [--dry-run]   extract work records from past sessions
   build                                                          rebuild graph.db from records + git
+  publish                                                        compile local records and publish to the FalkorDB API
   sync --session ID                                              live capture for one session (used by the Stop hook)
   related <path | repo/slug:path | text> [--all] [--json]         past work related to a file or text
   show <node-id>                                                  a node and its edges

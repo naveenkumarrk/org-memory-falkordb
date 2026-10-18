@@ -1,0 +1,4 @@
+FALKORDB_URL="redis://127.0.0.1:16379"
+# JSON map of API tokens to server-controlled org/repository permissions.
+# Run npm run setup:local to generate a random local token. Never publish real tokens.
+ORG_MEMORY_API_KEYS='{"replace-with-random-token":{"org":"demo","repos":["demo/commerce"],"role":"writer"}}'

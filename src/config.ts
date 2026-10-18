@@ -10,7 +10,7 @@ export type Corpus = 'prod' | 'test';
 
 // Org and folder layout come from env or ~/.org-memory/settings.json ({ "org", "workspaceRoot", "testRoot" }).
 const fileCfg: Record<string, string> = (() => {
-  try { return JSON.parse(fs.readFileSync(path.join(process.env.ORG_MEMORY_HOME ?? path.join(HOME, '.org-memory'), 'settings.json'), 'utf8')); } catch { return {}; }
+  try { return JSON.parse(fs.readFileSync(path.join(process.env.ORG_MEMORY_HOME ?? path.join(HOME, '.org-memory-falkordb'), 'settings.json'), 'utf8')); } catch { return {}; }
 })();
 const workspaceRoot = process.env.ORG_MEMORY_WORKSPACE ?? fileCfg.workspaceRoot ?? path.join(HOME, 'Desktop', 'workspace');
 const testRoot = process.env.ORG_MEMORY_TEST_ROOT ?? fileCfg.testRoot ?? path.join(HOME, 'Desktop', 'not_workspace');
@@ -31,7 +31,7 @@ export const CORPUS: Record<Corpus, { projectPrefix: string; repoRoot: string; o
 };
 
 export function dataDir(corpus: Corpus): string {
-  const base = process.env.ORG_MEMORY_HOME ?? path.join(HOME, '.org-memory');
+  const base = process.env.ORG_MEMORY_HOME ?? path.join(HOME, '.org-memory-falkordb');
   return corpus === 'prod' ? base : path.join(base, 'test');
 }
 

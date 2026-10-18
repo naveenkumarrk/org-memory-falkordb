@@ -7,6 +7,7 @@ hooks.settings.json
 !.env.example
 .dev.vars
 .dev.vars.*
+!.dev.vars.example
 .wrangler/
 .org-memory/
 .org-memory-falkordb/
@@ -16,3 +17,7 @@ sessions/
 logs/
 *.db-shm
 *.db-wal
+.demo/
+dist/
+web/vendor/
+.venv/

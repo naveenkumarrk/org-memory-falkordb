@@ -16,6 +16,8 @@ Primary track: **Agents That Act on Connected Data**. The primary demonstration 
 
 ## Fact semantics
 
+The local implementation now includes the FalkorDB/Workers API, scoped hook recall, typed evidence schema, snapshot/supersession handling, and an executable synthetic code-change demonstration. See the root README and `demo-proof.json` for current behavior and limitations. Submission delivery uses local setup plus a demo recording; production deployment and a live LLM task are not claimed.
+
 A quotation establishes an attributable statement; a Git check establishes commit existence/ancestry; a test establishes a specific observed outcome. Preserve those distinctions in stored metadata and displayed context.
 
 Unknown applicability stays unknown. A newer observation in a different repository, branch, or environment must not automatically supersede another claim. Prefer explicit replacement evidence and preserve history.

@@ -31,7 +31,7 @@ export function findClones(baseDir: string): Map<string, string[]> {
 }
 
 export type CommitInfo = { full: string; landed: boolean; ts: number; subject: string; files: string[] };
-export type FileState = 'current' | 'changed_since' | 'not_on_main';
+export type FileState = 'current' | 'changed_since' | 'not_on_main' | 'unknown';
 
 export class RepoIndex {
   slug: string;
@@ -111,14 +111,15 @@ export class RepoIndex {
     return this.hist;
   }
 
-  // Changed since the work ended, ignoring the work's own commits and a 2-day grace for its squash/merge landing.
+  // Changed since the work ended, ignoring only the work's exact own commits.
   fileState(rel: string, sinceIso: string, ownShas: string[] = []): FileState {
+    if (!this.roots.length || !this.ref(this.roots[0])) return 'unknown';
     const h = this.history();
     if (!h.onMain.has(rel)) return 'not_on_main';
     const since = Date.parse(sinceIso) / 1000;
-    if (!since) return 'current';
+    if (!Number.isFinite(since)) return 'unknown';
     const own = (sha: string) => ownShas.some((o) => sha.startsWith(o) || o.startsWith(sha));
-    const later = (h.changes.get(rel) ?? []).filter(([ts, sha]) => ts > since + 2 * 86_400 && !own(sha));
+    const later = (h.changes.get(rel) ?? []).filter(([ts, sha]) => ts > since && !own(sha));
     return later.length ? 'changed_since' : 'current';
   }
 
