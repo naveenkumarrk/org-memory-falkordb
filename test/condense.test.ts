@@ -13,7 +13,8 @@ execFileSync('git', ['init', '-q', repo]);
 execFileSync('git', ['-C', repo, 'remote', 'add', 'origin', 'https://github.com/acme/demo.git']);
 fs.mkdirSync(path.join(repo, 'src'));
 for (const f of ['a.ts', 'b.ts', 'c.ts']) fs.writeFileSync(path.join(repo, 'src', f), 'x');
-const rels = (cmd: string) => bashWrittenFiles(cmd, repo, 'test') // 'test' corpus is unscoped, so results don't depend on the local org setting.map((f) => `${f.slug}:${f.rel}`).sort();
+// 'test' corpus is unscoped, so results don't depend on the local org setting
+const rels = (cmd: string) => bashWrittenFiles(cmd, repo, 'test').map((f) => `${f.slug}:${f.rel}`).sort();
 
 test('reads and /dev/null redirects are not writes', () => {
   assert.deepEqual(rels('grep -n foo src/a.ts 2>/dev/null'), []);
