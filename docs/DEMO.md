@@ -35,7 +35,9 @@ Open http://127.0.0.1:8787. The header must say FalkorDB connected and report 8 
 - `.demo/proposals/compatible.ts`: actual passing implementation.
 - `docs/assets/inspector.png`: inspector capture from the running application.
 
-A [captioned recording of the live application](https://github.com/naveenkumarrk/org-memory-falkordb/releases/download/v0.1.0-demo/org-memory-demo.webm) is attached to the [demo release](https://github.com/naveenkumarrk/org-memory-falkordb/releases/tag/v0.1.0-demo). It has no microphone narration; use the script above for a live presentation or voiceover.
+A [narrated full demo](https://github.com/naveenkumarrk/org-memory-falkordb/releases/download/v0.2.0-demo/org-memory-full-demo.mp4) covers the live inspector and Alice/Bob handoff. The [full demo release](https://github.com/naveenkumarrk/org-memory-falkordb/releases/tag/v0.2.0-demo) includes subtitles and a transcript. Narration is generated locally; scene data is synthetic and the queries/tests are real. See [VIDEO.md](VIDEO.md) for the optional recording workflow.
+
+The [earlier short captioned recording](https://github.com/naveenkumarrk/org-memory-falkordb/releases/download/v0.1.0-demo/org-memory-demo.webm) remains available without narration.
 
 To regenerate a recording, optionally install `playwright` without saving it as an application dependency, run `npx playwright install chromium`, and then `node scripts/record-demo.playwright.js` from the project root with the API/database running. The helper seeds and restores the synthetic graph and saves `.demo/org-memory-demo.webm`. It does not record credentials. Playwright is optional and is not needed to run the application.
 

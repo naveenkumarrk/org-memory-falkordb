@@ -6,9 +6,9 @@
 
 Repository: https://github.com/naveenkumarrk/org-memory-falkordb
 
-Demo video: https://github.com/naveenkumarrk/org-memory-falkordb/releases/download/v0.1.0-demo/org-memory-demo.webm
+Demo video: https://github.com/naveenkumarrk/org-memory-falkordb/releases/download/v0.2.0-demo/org-memory-full-demo.mp4
 
-Release page: https://github.com/naveenkumarrk/org-memory-falkordb/releases/tag/v0.1.0-demo
+Release page: https://github.com/naveenkumarrk/org-memory-falkordb/releases/tag/v0.2.0-demo
 
 Delivery: reproducible local application, setup instructions, measured synthetic proof, and demo recording. No production deployment is claimed.
 
