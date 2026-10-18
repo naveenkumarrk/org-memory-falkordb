@@ -4,6 +4,10 @@
 
 Built for [Graph Hacks: Context for AI Agents](https://www.wemakedevs.org/hackathons/falkordb), Track 01 (Agents That Act on Connected Data), with a memory workflow relevant to Track 02.
 
+[Watch/download the captioned live demo](https://github.com/naveenkumarrk/org-memory-falkordb/releases/download/v0.1.0-demo/org-memory-demo.webm) · [Demo release](https://github.com/naveenkumarrk/org-memory-falkordb/releases/tag/v0.1.0-demo) · [CI](https://github.com/naveenkumarrk/org-memory-falkordb/actions)
+
+![Inspector showing live FalkorDB memory, provenance, graph paths, and executed test outcomes](docs/assets/inspector.png)
+
 ## What works
 
 - Real FalkorDB nodes, typed relationships, and parameterized Cypher traversals through a Cloudflare Workers / Hono API.
