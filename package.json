@@ -1,12 +1,20 @@
 {
-  "name": "org-memory",
+  "name": "org-memory-falkordb",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Team work memory graph on top of claude-mem (V1)",
-  "bin": { "orgmem": "bin/orgmem" },
-  "engines": { "node": ">=24" },
+  "description": "Evidence-backed graph memory for coding agents \u2014 Graph Hacks FalkorDB hackathon edition",
+  "bin": {
+    "orgmem": "bin/orgmem"
+  },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "test": "node --no-warnings --test test/*.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/naveenkumarrk/org-memory-falkordb.git"
   }
 }

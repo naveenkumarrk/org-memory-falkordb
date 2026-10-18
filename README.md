@@ -1,57 +1,93 @@
-# org-memory
+# org-memory × FalkorDB
 
-Team work memory for coding agents (Claude Code first). It turns your agent sessions into a graph of **what was done,
-why, and what went wrong** — work items, decisions, problems, facts, linked to files, commits and people — and gives
-an agent the few relevant pieces when it touches the same code again.
+Evidence-backed organizational memory for coding agents, being adapted for [Graph Hacks: Context for AI Agents](https://www.wemakedevs.org/hackathons/falkordb).
 
-It stores **facts about past work, never rules** (rules belong in `CLAUDE.md` / `AGENTS.md` in git).
+**Target:** Agents That Act on Connected Data (Track 01).
 
-## How it works
+The goal is to let a fresh coding agent use the team's relevant past discoveries to choose checks, investigate failures, and prepare a better code change. Each retrieved item should have a source, applicable code context, and an explainable graph path.
 
+## Implementation status
+
+This separate hackathon development repository derives from `naveenkumarrk/org-memory` at commit `893e5d4`. Original history is retained. The upstream repository is private.
+
+**The inherited implementation currently uses SQLite. FalkorDB integration and Cloudflare Workers deployment are planned, not implemented yet.** This repository is not yet a completed hackathon submission.
+
+Already available:
+
+- Claude Code session parsing, condensation, and structured extraction.
+- Work, decision, problem, and fact records with evidence quotes and file links.
+- Git commit checks and file freshness heuristics.
+- Graph-based retrieval and context delivery through Claude hooks.
+- Local inspection UI, shadow mode, and evaluation scripts.
+
+Hackathon work:
+
+- [ ] Make FalkorDB the primary graph store and execute retrieval traversals in Cypher.
+- [ ] Add an authenticated shared API targeting Cloudflare Workers.
+- [ ] Enforce repository exclusions consistently in knowledge retrieval.
+- [ ] Represent unknown freshness explicitly; replace the two-day freshness grace heuristic.
+- [ ] Distinguish evidence grounding, commit checks, and behavioral verification.
+- [ ] Return supporting graph paths and source references.
+- [ ] Demonstrate graph evidence changing an agent's test selection and code change.
+- [ ] Publish reproducible synthetic fixtures, results, setup instructions, and a demo video.
+
+See [hackathon scope](docs/HACKATHON.md) and [baseline/provenance](docs/BASELINE.md).
+
+## Planned architecture
+
+```text
+Local Claude Code hooks + capture + Git inspection
+                        |
+                        v
+             Cloudflare Workers API
+                        |
+                        v
+       FalkorDB: connected memory + evidence
+                        |
+                        v
+       Relevant context -> agent -> local checks/change
 ```
-Claude Code sessions (.jsonl) ─► parse + condense ─► extract (Haiku, JSON schema) ─► validate ─► records
-                                  (Edit tools and          (one call per chunk,        (verbatim quotes,
-                                   Bash-made changes)       cached)                     span-only files)
-git ─► commits verified, co-change, file freshness, config value history ─┐
-records ─────────────────────────────────────────────────────────────────┴─► graph.db (SQLite nodes/edges + FTS)
-graph.db ─► hooks (prompt / file touch / tool failure) ─► a few dated decisions, problems, facts ─► the agent
-         ─► CLI + local web UI (overview, work memory, sessions, files, Obsidian-style graph, shadow review, settings)
-```
 
-- **Unit of memory**: a *Work* item (one task) with *Decisions* (choice + why), *Problems* (symptom → cause → fix) and
-  *Facts*, each with a verbatim evidence quote; linked to *File*, *Commit* (verified in git), *Person*, *Topic*.
-- **Graph**: finds "past work related to this file" by walking edges (file → work that touched it → its decisions,
-  problems, facts; co-changed files), ~1–3 ms per lookup.
-- **Delivery**: knowledge items (not summaries), ≤4 per trigger, labelled *information, not instructions*; on a tool
-  failure, only *resolved* past problems with a strict token match. Shadow mode logs what would be injected without
-  injecting.
-- **Freshness**: facts are only injected while the code they describe is unchanged since they were recorded.
+Capture and command execution stay on the developer's machine. The Workers backend will handle authorized shared ingestion and retrieval. FalkorDB runs separately; its connection transport must be verified during implementation. SQLite in the inherited code is the migration baseline.
 
-## Setup
+## Run the inherited local baseline
 
-Requires Node 24+ (TypeScript runs natively) and Claude Code.
+Requires Node.js 24+. Session extraction and hook integration require Claude Code. Utility tests require neither Claude authentication nor access to past sessions.
 
 ```sh
-# ~/.org-memory/settings.json (optional): { "org": "<github-org>", "workspaceRoot": "<folder with company checkouts>" }
-./bin/orgmem backfill            # extract work records from past sessions in the workspace
-./bin/orgmem build               # build the graph (records + git)
-./bin/orgmem ui                  # http://127.0.0.1:7810 (local only)
-./bin/orgmem install shadow      # hooks for every session, logging only; `on` to inject, `uninstall` to remove
-./bin/orgmem related <file|text> # what past work is tied to a file
+npm test
 ```
 
-Data lives in `~/.org-memory` (never in a repo). Extraction uses your Claude Code login via `claude -p`.
+Use a separate data directory alongside the original:
 
-## Evaluation (`eval/`)
+```sh
+export ORG_MEMORY_HOME="$HOME/.org-memory-falkordb"
+```
 
-| Test | What it measures |
-|---|---|
-| `verify.ts` | evidence quotes found in the original sessions, commits exist in git, files exist |
-| `t1-records.ts` | record accuracy, judged against the source excerpt by a different model |
-| `t2-replay.ts` | time-split replay: would the cards shown in later sessions have helped? |
-| `t7-ab.ts` | memory ON vs OFF on real later tasks, replayed from the commit before the real change; blind diff judging |
-| `t8-qa.ts` | ON vs OFF on later questions whose answer was already in memory |
+The inherited local commands are:
 
-Headline from one engineer's ~70 sessions: records are accurate (97–100% faithful, 99.9% of quotes verbatim);
-work-summary delivery did **not** improve task outcomes (Δ −0.07); knowledge-item delivery leans positive (Δ +0.11,
-95% CI −0.07..+0.37, not significant) — most later tasks needed information that was never in memory.
+```sh
+./bin/orgmem build
+./bin/orgmem ui                  # http://127.0.0.1:7810
+./bin/orgmem related <file|text>
+```
+
+These commands expect records already present under the selected data directory. They currently use SQLite. `backfill` reads local Claude session history and may invoke Claude extraction; `install` edits Claude hook settings. Cloning this repository or running its tests performs neither action.
+
+Keep personal/company session exports, extracted records, databases, credentials, and evaluation outputs outside this public repository. Public demonstration data should be clearly identified as synthetic or drawn from an appropriate public source.
+
+## Demonstration target
+
+1. One agent discovers and checks a client compatibility constraint.
+2. A fresh agent receives a change request affecting a related service.
+3. FalkorDB traversal surfaces the constraint and supporting evidence.
+4. The agent selects and runs the relevant local test, then prepares and verifies a compatible change.
+5. New migration evidence changes what a later session retrieves and does.
+
+Compare with the same task without memory and, where feasible, without graph expansion. Report failures, costs, and latency alongside successful cases.
+
+## Reuse and evaluation
+
+Capture, extraction, local graph/UI, hook, and evaluation modules originate from the upstream project. Its [original README](docs/UPSTREAM_README.md) is preserved as historical documentation; its measurements concern the earlier implementation and are not independently reproduced results for this edition.
+
+The hackathon's main FalkorDB implementation must be new event work. Record that work separately from inherited functionality. Creating this repository does not establish eligibility or submission completion.
