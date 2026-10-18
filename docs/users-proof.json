@@ -1,0 +1,116 @@
+{
+  "measured_at": "2026-10-18T15:48:20.040Z",
+  "methodology": "Distinct API credentials, authenticated live Worker API calls, real FalkorDB graph reads/writes, separate synthetic workspaces and hook-state directories.",
+  "limitations": "Local client profiles on one machine, not two independently signed-in humans or a live Claude run. No signup/SSO system is implemented. All scenario knowledge is synthetic.",
+  "profiles": [
+    {
+      "org": "demo-team",
+      "repos": [
+        "demo/commerce"
+      ],
+      "role": "writer",
+      "user_id": "alice"
+    },
+    {
+      "org": "demo-team",
+      "repos": [
+        "demo/commerce"
+      ],
+      "role": "writer",
+      "user_id": "bob"
+    },
+    {
+      "org": "demo-other-team",
+      "repos": [
+        "demo/commerce"
+      ],
+      "role": "reader",
+      "user_id": "outsider"
+    }
+  ],
+  "initial_bob_items": [
+    "D-compatibility",
+    "F-client-contract"
+  ],
+  "alice_after_bob_items": [
+    "F-bob-opt-out",
+    "D-compatibility",
+    "F-client-contract"
+  ],
+  "shared_version": "d4f67341e4744e8f97b12ba578cadf16058531dc92f463d89a2b858e8ad46223",
+  "hook": {
+    "bob_received_alice_fact": true,
+    "alice_received_bob_fact": true,
+    "alice_context_chars": 813,
+    "bob_context_chars": 575
+  },
+  "same_session_excluded": true,
+  "outsider_items": 0,
+  "reader_write_http": 403,
+  "forbidden_repository_http": 403,
+  "bob_execution": {
+    "exit": 0,
+    "output": "✔ mobile checkout can still authenticate using its legacy token (2.795945ms)\n✔ modern tokens continue to authenticate (0.390535ms)\n✔ invalid tokens remain rejected (0.351407ms)\n✔ callers can explicitly disable legacy compatibility (0.28836ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 317.754495\n"
+  },
+  "paths": [
+    {
+      "nodes": [
+        "file:demo/commerce:src/authentication.ts",
+        "F-bob-opt-out"
+      ],
+      "relations": [
+        "ABOUT"
+      ]
+    },
+    {
+      "nodes": [
+        "file:demo/commerce:src/authentication.ts",
+        "W-client-investigation",
+        "D-compatibility"
+      ],
+      "relations": [
+        "TOUCHED",
+        "DECIDED"
+      ]
+    },
+    {
+      "nodes": [
+        "file:demo/commerce:src/authentication.ts",
+        "W-client-investigation",
+        "F-client-contract"
+      ],
+      "relations": [
+        "TOUCHED",
+        "LEARNED"
+      ]
+    }
+  ],
+  "executed_queries": [
+    {
+      "cypher": "MATCH (f:Memory) WHERE f.version=$version AND f.type='File'\n      AND (($explicit AND f.id IN $ids) OR (NOT $explicit AND any(t IN $tokens WHERE toLower(f.id) ENDS WITH t)))\n      RETURN f.id AS id,f.payload AS payload,f.fingerprint AS fingerprint LIMIT 12",
+      "params": {
+        "version": "d4f67341e4744e8f97b12ba578cadf16058531dc92f463d89a2b858e8ad46223",
+        "ids": [
+          "file:demo/commerce:src/authentication.ts"
+        ],
+        "tokens": [
+          "authentication.ts"
+        ],
+        "explicit": true
+      },
+      "rows": 1,
+      "ms": 3
+    },
+    {
+      "cypher": "MATCH p=(f:Memory)-[*1..3]-(k:Memory)\n        WHERE f.version=$version AND f.type='File' AND f.id IN $files\n          AND k.type IN ['Fact','Decision','Problem'] AND k.status IN ['current','active']\n          AND all(n IN nodes(p) WHERE n.version=$version AND (NOT n.type IN ['Fact','Decision','Problem'] OR n.status IN ['current','active']))\n          AND all(r IN relationships(p) WHERE type(r) IN ['ABOUT','TOUCHED','REFERENCED','DECIDED','HIT','LEARNED','CO_CHANGED'])\n        RETURN k.id AS id,k.type AS type,k.payload AS payload,k.source AS source,k.verification AS verification,\n          [n IN nodes(p) | n.id] AS nodes,[r IN relationships(p) | type(r)] AS relations,length(p) AS hops\n        ORDER BY hops ASC, id ASC LIMIT 80",
+      "params": {
+        "version": "d4f67341e4744e8f97b12ba578cadf16058531dc92f463d89a2b858e8ad46223",
+        "files": [
+          "file:demo/commerce:src/authentication.ts"
+        ]
+      },
+      "rows": 6,
+      "ms": 6
+    }
+  ]
+}

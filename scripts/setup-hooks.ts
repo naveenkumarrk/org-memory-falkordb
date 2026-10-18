@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { clientConfig } from './client.ts';
 
-const root = path.resolve('.demo/hook-home');
+const root = path.resolve(process.env.ORG_MEMORY_HOOK_HOME ?? '.demo/hook-home');
 fs.mkdirSync(root, { recursive: true });
 fs.writeFileSync(path.join(root, 'remote.json'), JSON.stringify(clientConfig()), { mode: 0o600 });
 const hook = path.resolve('src/hook.ts');

@@ -10,6 +10,8 @@
 
 The local demo is the current submission path. The Worker bundle has been checked locally; production connectivity is not claimed.
 
+For separate local Alice/Bob clients, run `npm run demo:users:setup` and restart `npm run dev` to load new credential mappings when instructed. `npm run demo:users` then verifies shared memory, independent hook state, and a separate organization. The complete workflow is in [WORKING.md](WORKING.md).
+
 ## Private organization memory
 
 Local setup generates a `demo` identity that accepts synthetic evidence only and is visible through read-only demo endpoints. Configure an additional non-demo identity for actual organization records. Keep those keys and records in ignored files and outside the public repository.

@@ -41,6 +41,13 @@ test('API rejects missing credentials before accessing a database', async () => 
   const response = await app.request('/v1/graph?repository=demo/commerce', {}, env);
   assert.equal(response.status, 401);
 });
+test('authenticated identity reports scope without revealing credentials or using the database', async () => {
+  const response = await app.request('/v1/me', { headers: { Authorization: 'Bearer testkey' } }, env);
+  assert.equal(response.status, 200);
+  const identity = await response.json();
+  assert.deepEqual(identity, { org: 'test', repos: ['demo/commerce'], role: 'reader' });
+  assert.ok(!JSON.stringify(identity).includes('testkey'));
+});
 test('API enforces repository membership and read-only keys', async () => {
   const headers = { Authorization: 'Bearer testkey', 'Content-Type': 'application/json' };
   assert.equal((await app.request('/v1/graph?repository=private/other', { headers }, env)).status, 403);

@@ -75,7 +75,7 @@ export const RecallSchema = z.object({
   types: z.array(z.enum(['Fact', 'Decision', 'Problem'])).max(3).default([]),
 }).strict();
 export type Recall = z.infer<typeof RecallSchema>;
-export const PrincipalSchema = z.object({ org: z.string().min(1), repos: z.array(z.string()).min(1), role: z.enum(['reader', 'writer']) }).strict();
+export const PrincipalSchema = z.object({ org: z.string().min(1), repos: z.array(z.string()).min(1), role: z.enum(['reader', 'writer']), user_id: z.string().min(1).max(100).optional() }).strict();
 export type Principal = z.infer<typeof PrincipalSchema>;
 export const KNOWLEDGE = new Set(['Decision', 'Problem', 'Fact']);
 

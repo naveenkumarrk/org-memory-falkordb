@@ -68,6 +68,8 @@ This publishes synthetic memory, queries the graph, compares expansion on/off, r
 
 Results and actual query/test output are saved in [docs/demo-proof.json](docs/demo-proof.json). Commands, a recording outline, and submission text are in [docs/DEMO.md](docs/DEMO.md) and [docs/SUBMISSION.md](docs/SUBMISSION.md).
 
+For an explanation of the request flow and a two-client sharing demonstration, see [docs/WORKING.md](docs/WORKING.md). Run `npm run demo:users:setup`, restart the dev server if instructed, then `npm run demo:users`. Separate Alice/Bob keys share a dedicated team graph; an outsider belongs to a separate organization. Their actual hook processes are tested with independent local state. [Measured cross-client results](docs/users-proof.json) include both directions of the memory handoff and permission checks.
+
 | Scenario | Observed result |
 | --- | --- |
 | Graph traversal enabled | 2 memories, through past work |

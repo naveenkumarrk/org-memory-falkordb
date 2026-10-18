@@ -39,6 +39,7 @@ async function useGraph<T>(env: Bindings, principal: Principal, repository: stri
   finally { await db.close(); }
 }
 
+app.get('/v1/me', c => c.json(c.get('principal')));
 app.post('/v1/ingest', async c => {
   const principal = c.get('principal');
   if (principal.role !== 'writer') return c.json({ error: 'Write access required' }, 403);
