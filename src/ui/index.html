@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>org-memory</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/force-graph@1.43.5/dist/force-graph.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand"><span class="dot"></span>org-memory</div>
+      <div class="seg" id="corpus">
+        <button data-c="prod">Company</button>
+        <button data-c="test">Test</button>
+      </div>
+      <div class="spacer"></div>
+      <span id="health" class="small muted"></span>
+      <div class="seg" id="mode" title="Hook mode for every Claude Code session">
+        <button data-m="shadow">Shadow</button><button data-m="on">On</button><button data-m="off">Off</button>
+      </div>
+    </header>
+    <nav id="nav">
+      <div class="sec">Memory</div>
+      <a data-v="overview">Overview</a>
+      <a data-v="memory">Work memory <span class="count" id="n-work"></span></a>
+      <a data-v="sessions">Sessions <span class="count" id="n-sessions"></span></a>
+      <a data-v="files">Files</a>
+      <a data-v="graph">Graph</a>
+      <a data-v="review">Review <span class="count" id="n-review"></span></a>
+      <div class="sec">Agent</div>
+      <a data-v="shadow">Shadow review <span class="count" id="n-shadow"></span></a>
+      <a data-v="preview">What Claude sees</a>
+      <a data-v="activity">Activity</a>
+      <div class="sec">Control</div>
+      <a data-v="team">Team</a>
+      <a data-v="settings">Settings</a>
+    </nav>
+    <main id="main"></main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

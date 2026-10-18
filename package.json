@@ -1,0 +1,12 @@
+{
+  "name": "org-memory",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Team work memory graph on top of claude-mem (V1)",
+  "bin": { "orgmem": "bin/orgmem" },
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --no-warnings --test test/*.test.ts"
+  }
+}
