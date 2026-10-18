@@ -52,6 +52,14 @@ The inherited `./bin/orgmem install on` installs capture/recall hooks globally a
 
 The database remains a separate hosted service. Follow the [FalkorDB guide](https://docs.falkordb.com/getting-started) for the server/client model. Outbound database connectivity must be verified from the deployed Worker; local runtime success alone does not establish that.
 
+To obtain `FALKORDB_URL`, sign in to [FalkorDB Cloud](https://app.falkordb.cloud/), select a running instance, and open its Connectivity/Connect details. Copy the connection URI if provided, or combine the database username, password, public host, and assigned port:
+
+```dotenv
+FALKORDB_URL="rediss://USERNAME:URL_ENCODED_PASSWORD@HOST:PORT"
+```
+
+Use `rediss://` when the instance requires TLS and `redis://` for a connection without TLS. URL-encode reserved characters in the username/password. Use the database endpoint, not the HTTPS browser UI address. Store this only in the ignored `.env.hosted` file. See the [official deployment guide](https://www.falkordb.com/blog/graph-database-deployment-guide/) for instance connection details.
+
 ```sh
 npx wrangler login
 npm run deploy

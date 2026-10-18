@@ -9,9 +9,13 @@ const database = process.env.FALKORDB_URL;
 const endpoint = process.env.ORG_MEMORY_API_URL;
 if (!database || !endpoint) throw new Error('Set FALKORDB_URL and ORG_MEMORY_API_URL in gitignored .env.hosted first.');
 if (new URL(endpoint).protocol !== 'https:') throw new Error('The hosted API URL must use HTTPS.');
-const db = await connect(database);
-try { await db.selectGraph('orgmem_connection_check').query('RETURN 1 AS connected'); }
-finally { await db.close(); }
+let db: Awaited<ReturnType<typeof connect>> | undefined;
+try {
+  db = await connect(database);
+  await db.selectGraph('orgmem_connection_check').query('RETURN 1 AS connected');
+} catch {
+  throw new Error('FalkorDB connection failed. Run npm run hosted:check after checking .env.hosted. Connection details were not printed.');
+} finally { await db?.close(); }
 fs.mkdirSync('.demo', { recursive: true });
 const clientFile = '.demo/hosted-client.json';
 const existing = fs.existsSync(clientFile) ? JSON.parse(fs.readFileSync(clientFile, 'utf8')) : null;

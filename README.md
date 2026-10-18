@@ -18,7 +18,7 @@ Built for [Graph Hacks: Context for AI Agents](https://www.wemakedevs.org/hackat
 - A browser inspector showing actual graph data, evidence, relationship paths, executed Cypher, parameters, returned row counts, and timings.
 - A reproducible synthetic demo: memory selects an allowlisted compatibility test, a proposed removal fails, and a compatibility-preserving simplification passes all four fixture tests.
 
-**Current delivery is local.** The Workers runtime and FalkorDB run as separate processes. A production Cloudflare deployment and a live Claude task have not been verified. The demo uses synthetic knowledge and a deterministic policy, not an LLM performance benchmark.
+**Deployment in progress:** the [Cloudflare app](https://org-memory-falkordb.111naveenkumarrk.workers.dev) is published, but its hosted FalkorDB connection and API credentials are not configured yet. Graph queries are currently verified locally; the hosted graph workflow and a live Claude task have not been verified. The demo uses synthetic knowledge and a deterministic policy, not an LLM performance benchmark.
 
 ## Quick start
 
